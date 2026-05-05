@@ -85,7 +85,8 @@ class Payment(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return f"Payment for Order {self.order.id} - {self.payment_method}"
+        target = f"Order #{self.order.id}" if self.order else f"Booking #{self.booking.id}"
+        return f"Payment for {target} - {self.payment_method}"
 
 class Cart(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='cart')

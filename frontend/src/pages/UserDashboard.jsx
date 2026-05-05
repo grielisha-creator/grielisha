@@ -185,7 +185,7 @@ const UserDashboard = () => {
       <h3 className="text-2xl font-bold text-glow mb-6">Order History</h3>
       {(orders || []).length > 0 ? (
         <div className="space-y-4">
-          {(orders || []).map((order) => (
+          {Array.isArray(orders) && orders.map((order) => (
             <motion.div
               key={order.id}
               initial={{ opacity: 0, x: -20 }}
@@ -207,7 +207,7 @@ const UserDashboard = () => {
                 <div>
                   <p className="text-gray-400 text-xs mb-2 uppercase font-bold tracking-widest">Items ({order.item_count})</p>
                   <div className="space-y-1">
-                    {(order.items || []).map((item, index) => (
+                    {Array.isArray(order.items) && order.items.map((item, index) => (
                       <div key={index} className="text-sm text-gray-300 flex justify-between">
                         <span>{item.quantity}x {item.name}</span>
                         <span className="text-white/50">KES {item.price.toLocaleString()}</span>
@@ -293,7 +293,7 @@ const UserDashboard = () => {
       <h3 className="text-2xl font-bold text-glow mb-6">Service Bookings</h3>
       {(bookings || []).length > 0 ? (
         <div className="space-y-4">
-          {(bookings || []).map((booking) => (
+          {Array.isArray(bookings) && bookings.map((booking) => (
             <motion.div
               key={booking.id}
               initial={{ opacity: 0, x: -20 }}
@@ -476,7 +476,7 @@ const UserDashboard = () => {
         {/* Tab Navigation */}
         <div className="glass rounded-xl p-2 mb-8">
           <div className="flex flex-wrap gap-2">
-            {(tabs || []).map((tab) => (
+            {Array.isArray(tabs) && tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
@@ -583,7 +583,7 @@ const UserDashboard = () => {
                 <div>
                   <h4 className="text-white font-bold mb-3 border-b border-white/10 pb-2">Purchased Items</h4>
                   <div className="space-y-3">
-                    {(selectedOrder.items || []).map((item, idx) => (
+                    {Array.isArray(selectedOrder.items) && selectedOrder.items.map((item, idx) => (
                       <div key={idx} className="flex justify-between items-center bg-white/5 p-3 rounded-lg">
                         <div className="flex items-center">
                           <div className="w-8 h-8 rounded bg-accent/20 flex items-center justify-center text-accent font-bold mr-3">{item.quantity}x</div>

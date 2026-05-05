@@ -19,9 +19,12 @@ def log_product_changes(sender, instance, created, **kwargs):
     admin = User.objects.filter(is_staff=True).first()
     
     if admin:
-        ActivityLog.objects.create(
-            user=admin,
-            action=action,
-            description=f"Product '{instance.name}' was {verb}. Status: {status}. Stock: {instance.stock_quantity}"
-        )
+        try:
+            ActivityLog.objects.create(
+                user=admin,
+                action=action,
+                description=f"Product '{instance.name}' was {verb}. Status: {status}. Stock: {instance.stock_quantity}"
+            )
+        except Exception as e:
+            print(f"Logging error in log_product_changes: {e}")
 

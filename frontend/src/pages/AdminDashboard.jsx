@@ -26,6 +26,7 @@ const AdminDashboard = () => {
   const [editingItem, setEditingItem] = useState(null)
   const [selectedEntry, setSelectedEntry] = useState(null)
   const [formData, setFormData] = useState({})
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false)
   const [selectedProductIds, setSelectedProductIds] = useState([])
   const [selectedServiceIds, setSelectedServiceIds] = useState([])
 
@@ -115,16 +116,22 @@ const AdminDashboard = () => {
   const handleUpdateLogistics = async (e) => {
     e.preventDefault()
     try {
-      await api.patch(`orders/${selectedEntry.id}/`, {
-        delivery_status: formData.delivery_status,
-        transport_provider: formData.transport_provider,
-        tracking_number: formData.tracking_number,
-        estimated_delivery_date: formData.estimated_delivery_date
-      })
+      const endpoint = selectedEntry.type === 'Booking' ? `bookings/${selectedEntry.id}/` : `orders/${selectedEntry.id}/`
+      const payload = selectedEntry.type === 'Booking' 
+        ? { status: formData.status }
+        : {
+            delivery_status: formData.delivery_status,
+            transport_provider: formData.transport_provider,
+            tracking_number: formData.tracking_number,
+            estimated_delivery_date: formData.estimated_delivery_date
+          }
+          
+      await api.patch(endpoint, payload)
       setIsLogisticsModalOpen(false)
+      setIsBookingModalOpen(false)
       fetchDashboardData()
     } catch (err) {
-      alert("Failed to update logistics status.")
+      alert(`Failed to update ${selectedEntry?.type?.toLowerCase() || 'logistics'} status.`)
     }
   }
 
@@ -162,7 +169,7 @@ const AdminDashboard = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {(payments || []).map((payment) => (
+              {Array.isArray(payments) && payments.map((payment) => (
                 <tr key={payment.id} className="hover:bg-white/5 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-2 text-white">
@@ -252,7 +259,7 @@ const AdminDashboard = () => {
   }
 
   const handleSelectAll = (type, items) => {
-    const itemIds = (items || []).map(i => i.id)
+    const itemIds = (Array.isArray(items) ? items : []).map(i => i.id)
     if (type === 'product') {
       if (selectedProductIds.length === itemIds.length) {
         setSelectedProductIds([])
@@ -360,7 +367,7 @@ const AdminDashboard = () => {
           required
         >
           <option value="">Select Category</option>
-          {(categories || []).map(cat => (
+          {Array.isArray(categories) && categories.map(cat => (
             <option key={cat.id} value={cat.id}>{cat.name}</option>
           ))}
         </select>
@@ -617,8 +624,8 @@ const AdminDashboard = () => {
             <button className="text-sm text-accent hover:text-white transition-colors">View All</button>
           </div>
           <div className="space-y-4">
-            {(activities || []).length > 0 ? (
-              (activities || []).map((log) => (
+            {Array.isArray(activities) && activities.length > 0 ? (
+              activities.map((log) => (
                 <div key={log.id} className="flex items-start space-x-3 border-b border-white/5 pb-3">
                   <div className="bg-accent/10 p-2 rounded-lg">
                     <TrendingUp size={16} className="text-accent" />
@@ -713,7 +720,7 @@ const AdminDashboard = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {(products || []).map((product) => (
+              {Array.isArray(products) && products.map((product) => (
                 <tr key={product.id} className={`hover:bg-white/5 transition-colors ${selectedProductIds.includes(product.id) ? 'bg-accent/5' : ''}`}>
                   <td className="px-6 py-4">
                     <input
@@ -802,7 +809,7 @@ const AdminDashboard = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {(services || []).map((service) => (
+              {Array.isArray(services) && services.map((service) => (
                 <tr key={service.id} className={`hover:bg-white/5 transition-colors ${selectedServiceIds.includes(service.id) ? 'bg-accent/5' : ''}`}>
                   <td className="px-6 py-4">
                     <input
@@ -871,7 +878,7 @@ const AdminDashboard = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {(orders || []).map((order) => (
+              {Array.isArray(orders) && orders.map((order) => (
                 <tr key={order.id} className="hover:bg-white/5 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">#{order.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -914,10 +921,11 @@ const AdminDashboard = () => {
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">User</th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Price</th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {(bookings || []).map((booking) => (
+              {Array.isArray(bookings) && bookings.map((booking) => (
                 <tr key={booking.id} className="hover:bg-white/5 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">#{booking.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -928,17 +936,29 @@ const AdminDashboard = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-accent font-semibold">
                     KES {parseFloat(booking.total_price).toLocaleString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
-                      booking.status === 'paid' || booking.status === 'confirmed' ? 'bg-green-500/20 text-green-400' : 
-                      booking.status === 'pending' || booking.status === 'pending_payment' ? 'bg-yellow-500/20 text-yellow-400' :
-                      booking.status === 'rejected' || booking.status === 'cancelled' ? 'bg-red-500/20 text-red-400' :
-                      'bg-blue-500/20 text-blue-400'
-                    }`}>
-                      {booking.status?.replace('_', ' ') || 'pending'}
-                    </span>
-                  </td>
-                </tr>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
+                        booking.status === 'paid' || booking.status === 'confirmed' ? 'bg-green-500/20 text-green-400' : 
+                        booking.status === 'pending' || booking.status === 'pending_payment' ? 'bg-yellow-500/20 text-yellow-400' :
+                        booking.status === 'rejected' || booking.status === 'cancelled' ? 'bg-red-500/20 text-red-400' :
+                        'bg-blue-500/20 text-blue-400'
+                      }`}>
+                        {booking.status?.replace('_', ' ') || 'pending'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <button
+                        onClick={() => {
+                          setSelectedEntry({ ...booking, type: 'Booking' });
+                          setFormData({ status: booking.status });
+                          setIsBookingModalOpen(true);
+                        }}
+                        className="p-1 px-3 bg-accent/20 text-accent rounded-lg hover:bg-accent/30 transition-all text-xs"
+                      >
+                        Update
+                      </button>
+                    </td>
+                  </tr>
               ))}
             </tbody>
           </table>
@@ -966,7 +986,7 @@ const AdminDashboard = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {(users || []).map((user) => (
+              {Array.isArray(users) && users.map((user) => (
                 <tr key={user.id} className="hover:bg-white/5 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-white">{user.username}</div>
@@ -999,7 +1019,7 @@ const AdminDashboard = () => {
 
   const LogisticsTab = () => {
     // Merge orders and bookings into a single chronological log
-    const orderEntries = (orders || []).map(o => ({
+    const orderEntries = (Array.isArray(orders) ? orders : []).map(o => ({
       id: o.id,
       type: 'Order',
       customer: o.user_email || o.email || 'N/A',
@@ -1011,7 +1031,7 @@ const AdminDashboard = () => {
       tracking_number: o.tracking_number,
       destination: o.shipping_address ? `${o.shipping_address}${o.city ? ', ' + o.city : ''}` : 'N/A',
     }))
-    const bookingEntries = (bookings || []).map(b => ({
+    const bookingEntries = (Array.isArray(bookings) ? bookings : []).map(b => ({
       id: b.id,
       type: 'Booking',
       customer: b.user_email || 'N/A',
@@ -1055,7 +1075,7 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {(combined || []).map((entry, idx) => (
+                {Array.isArray(combined) && combined.map((entry, idx) => (
                   <tr key={`${entry.type}-${entry.id}-${idx}`} className="hover:bg-white/5 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${entry.type === 'Order' ? 'bg-accent/20 text-accent' : 'bg-blue-500/20 text-blue-400'
@@ -1104,23 +1124,29 @@ const AdminDashboard = () => {
                         <span className="text-gray-600 text-xs italic">—</span>
                       )}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400 font-mono">
+                      {entry.tracking_number || <span className="text-gray-600 italic">No Ref</span>}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
-                      {entry.type === 'Order' && (
-                        <button
-                          onClick={() => {
-                            setSelectedEntry(entry);
+                      <button
+                        onClick={() => {
+                          setSelectedEntry(entry);
+                          if (entry.type === 'Order') {
                             setFormData({
                               delivery_status: entry.delivery_status,
                               transport_provider: entry.transport_provider,
                               tracking_number: entry.tracking_number,
                             });
                             setIsLogisticsModalOpen(true);
-                          }}
-                          className="p-1 px-3 bg-accent/20 text-accent rounded-lg hover:bg-accent/30 transition-all text-xs"
-                        >
-                          Update
-                        </button>
-                      )}
+                          } else {
+                            setFormData({ status: entry.status });
+                            setIsBookingModalOpen(true);
+                          }
+                        }}
+                        className="p-1 px-3 bg-accent/20 text-accent rounded-lg hover:bg-accent/30 transition-all text-xs"
+                      >
+                        Update
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -1166,7 +1192,7 @@ const AdminDashboard = () => {
         {/* Tab Navigation */}
         <div className="glass rounded-xl p-2 mb-8 overflow-x-auto">
           <div className="flex space-x-2 min-w-max">
-            {(tabs || []).map((tab) => (
+            {Array.isArray(tabs) && tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
@@ -1265,6 +1291,47 @@ const AdminDashboard = () => {
                 </button>
                 <button type="submit" className="btn-premium">
                   Update Logistics
+                </button>
+              </ModalFooter>
+            </form>
+          </ModalBody>
+        </Modal>
+
+        {/* BOOKING STATUS MODAL */}
+        <Modal
+          isOpen={isBookingModalOpen}
+          onClose={() => setIsBookingModalOpen(false)}
+          title={`Update Booking Status: #${selectedEntry?.id}`}
+          size="small"
+        >
+          <ModalBody>
+            <form onSubmit={handleUpdateLogistics} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Booking Status</label>
+                <select
+                  name="status"
+                  value={formData.status || ''}
+                  onChange={handleInputChange}
+                  className="w-full bg-black/30 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-accent"
+                >
+                  <option value="pending">Pending Confirmation</option>
+                  <option value="pending_payment">Pending Payment</option>
+                  <option value="paid">Paid / Confirmed</option>
+                  <option value="completed">Completed</option>
+                  <option value="rejected">Payment Rejected</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+              <ModalFooter>
+                <button
+                  type="button"
+                  onClick={() => setIsBookingModalOpen(false)}
+                  className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn-premium">
+                  Update Status
                 </button>
               </ModalFooter>
             </form>
