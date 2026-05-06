@@ -1,143 +1,199 @@
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 
 const COMPANY_NAME = 'GRIELISHA DIGITAL';
 const COMPANY_CONTACT = 'info@grielisha.com | +254 700 000 000';
 const COMPANY_ADDRESS = 'Kisumu, Kenya';
 
+// Draw a table manually using raw jsPDF primitives
+const drawTable = (doc, headers, rows, startY) => {
+  const colWidths = headers.map(() => 170 / headers.length);
+  const rowHeight = 10;
+  const startX = 14;
+
+  // Header row background
+  doc.setFillColor(15, 23, 42);
+  doc.rect(startX, startY, 182, rowHeight, 'F');
+
+  // Header text
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'bold');
+  headers.forEach((h, i) => {
+    const x = startX + colWidths.slice(0, i).reduce((a, b) => a + b, 0) + 2;
+    doc.text(String(h), x, startY + 7);
+  });
+
+  // Draw data rows
+  doc.setFont('helvetica', 'normal');
+  rows.forEach((row, rowIdx) => {
+    const y = startY + rowHeight * (rowIdx + 1);
+    // Alternate row background
+    if (rowIdx % 2 === 0) {
+      doc.setFillColor(248, 250, 252);
+      doc.rect(startX, y, 182, rowHeight, 'F');
+    }
+    doc.setTextColor(30, 30, 30);
+    row.forEach((cell, i) => {
+      const x = startX + colWidths.slice(0, i).reduce((a, b) => a + b, 0) + 2;
+      const truncated = String(cell ?? '').substring(0, 28);
+      doc.text(truncated, x, y + 7);
+    });
+    // Row border
+    doc.setDrawColor(220, 220, 220);
+    doc.line(startX, y + rowHeight, startX + 182, y + rowHeight);
+  });
+
+  // Outer border
+  doc.setDrawColor(15, 23, 42);
+  doc.rect(startX, startY, 182, rowHeight * (rows.length + 1));
+
+  return startY + rowHeight * (rows.length + 1);
+};
+
 export const generateDocument = (item, type, docType) => {
   const doc = new jsPDF();
   const dateStr = new Date().toLocaleDateString();
-  const title = `${docType.toUpperCase()}`;
-  
-  // Header Background
-  doc.setFillColor(15, 23, 42); // slate-900
-  doc.rect(0, 0, 210, 40, 'F');
-  
-  // Company Info
+
+  // ── Header band ──
+  doc.setFillColor(15, 23, 42);
+  doc.rect(0, 0, 210, 42, 'F');
+
   doc.setTextColor(255, 255, 255);
+  doc.setFontSize(22);
+  doc.setFont('helvetica', 'bold');
+  doc.text(COMPANY_NAME, 14, 18);
+
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(156, 163, 175);
+  doc.text(`${COMPANY_ADDRESS}  |  ${COMPANY_CONTACT}`, 14, 26);
+
+  // Document type label (top right)
+  doc.setTextColor(249, 115, 22);
   doc.setFontSize(24);
-  doc.text(COMPANY_NAME, 14, 20);
+  doc.setFont('helvetica', 'bold');
+  doc.text(docType.toUpperCase(), 196, 22, { align: 'right' });
+
+  // ── Meta info ──
+  doc.setTextColor(30, 30, 30);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  const refId = type === 'Order' ? `ORD-${item.id}` : `BKG-${item.id}`;
+  doc.text(`Reference: ${refId}`, 14, 52);
+  doc.text(`Date: ${dateStr}`, 14, 58);
+  doc.text(`Status: ${item.status?.toUpperCase()?.replace(/_/g, ' ') || 'UNKNOWN'}`, 14, 64);
+
+  // ── Customer block ──
+  const customerEmail = item.email || item.user_email || 'N/A';
+  const customerAddr = type === 'Order'
+    ? [item.shipping_address, item.city].filter(Boolean).join(', ') || 'N/A'
+    : item.location || 'N/A';
+
+  doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
-  doc.setTextColor(156, 163, 175); // gray-400
-  doc.text(`${COMPANY_ADDRESS} | ${COMPANY_CONTACT}`, 14, 28);
-  
-  // Document Type
-  doc.setTextColor(249, 115, 22); // orange-500
-  doc.setFontSize(28);
-  doc.text(title, 200, 25, { align: 'right' });
-  
-  // Reset text color for body
-  doc.setTextColor(0, 0, 0);
-  doc.setFontSize(10);
-  
-  // Meta Info
-  doc.text(`Date: ${dateStr}`, 14, 50);
-  doc.text(`Reference ID: ${type === 'Order' ? 'ORD' : 'BKG'}-${item.id}`, 14, 56);
-  doc.text(`Status: ${item.status?.toUpperCase()?.replace('_', ' ') || 'UNKNOWN'}`, 14, 62);
-  
-  // Customer Info
-  const customerName = item.full_name || item.email || item.user_email || 'Valued Customer';
-  const customerAddress = type === 'Order' 
-    ? (item.shipping_address ? `${item.shipping_address}${item.city ? ', ' + item.city : ''}` : 'N/A') 
-    : (item.location || 'N/A');
-    
-  doc.setFontSize(12);
-  doc.text('Bill To:', 120, 50);
-  doc.setFontSize(10);
-  doc.text(`Name: ${customerName}`, 120, 56);
+  doc.text('BILL TO:', 120, 52);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text(`Email: ${customerEmail}`, 120, 58);
   if (type === 'Order') {
-     doc.text(`Address: ${customerAddress}`, 120, 62);
-     if (item.phone) doc.text(`Phone: ${item.phone}`, 120, 68);
+    doc.text(`Address: ${customerAddr}`, 120, 64);
+    if (item.phone) doc.text(`Phone: ${item.phone}`, 120, 70);
   } else {
-     doc.text(`Location: ${customerAddress}`, 120, 62);
-     if (item.booking_date) doc.text(`Scheduled: ${item.booking_date} ${item.booking_time}`, 120, 68);
+    doc.text(`Location: ${customerAddr}`, 120, 64);
+    if (item.booking_date) doc.text(`Scheduled: ${item.booking_date} ${item.booking_time || ''}`, 120, 70);
   }
-  
-  // Table
-  let head = [['Description', 'Quantity', 'Unit Price (KES)', 'Total (KES)']];
-  let body = [];
-  
-  if (type === 'Order') {
-    if (item.items && Array.isArray(item.items)) {
-       item.items.forEach(i => {
-           if (docType === 'Delivery Note') {
-               head = [['Item Description', 'Quantity Ordered', 'Quantity Delivered']];
-               body.push([i.name, i.quantity, '']);
-           } else {
-               body.push([i.name, i.quantity, parseFloat(i.price).toLocaleString(), (i.quantity * parseFloat(i.price)).toLocaleString()]);
-           }
-       });
+
+  // ── Table ──
+  let headers = [];
+  let rows = [];
+
+  if (docType === 'Delivery Note') {
+    if (type === 'Order') {
+      headers = ['Item Description', 'Qty Ordered', 'Qty Delivered'];
+      if (item.items?.length) {
+        rows = item.items.map(i => [i.name, i.quantity, '______']);
+      } else {
+        rows = [[`Order #${item.id} — Assorted Items`, '1', '______']];
+      }
     } else {
-       if (docType === 'Delivery Note') {
-           head = [['Item Description', 'Quantity Ordered', 'Quantity Delivered']];
-           body.push([`Assorted Order Items (ID: ${item.id})`, '1', '']);
-       } else {
-           body.push([`Assorted Order Items (ID: ${item.id})`, 1, parseFloat(item.total_amount).toLocaleString(), parseFloat(item.total_amount).toLocaleString()]);
-       }
+      headers = ['Service Description', 'Execution Status', 'Client Sign-off'];
+      rows = [[item.service_name || 'Service', item.status || 'Pending', '______']];
     }
   } else {
-     if (docType === 'Delivery Note') {
-         head = [['Service Description', 'Execution Status', 'Client Sign-off']];
-         body.push([item.service_name, item.status, '']);
-     } else {
-         body.push([item.service_name, 1, parseFloat(item.total_price).toLocaleString(), parseFloat(item.total_price).toLocaleString()]);
-     }
-  }
-  
-  autoTable(doc, {
-    startY: 80,
-    head: head,
-    body: body,
-    theme: 'grid',
-    headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255] },
-    alternateRowStyles: { fillColor: [248, 250, 252] },
-    margin: { top: 80 }
-  });
-  
-  const finalY = doc.lastAutoTable?.finalY || 80;
-  
-  if (docType !== 'Delivery Note') {
-      const totalAmount = type === 'Order' ? item.total_amount : item.total_price;
-      
-      doc.setFillColor(241, 245, 249); // slate-100
-      doc.rect(130, finalY + 10, 66, 25, 'F');
-      
-      doc.setFontSize(11);
-      doc.text('Subtotal:', 135, finalY + 18);
-      doc.text(`KES ${parseFloat(totalAmount).toLocaleString()}`, 190, finalY + 18, { align: 'right' });
-      
-      doc.setFontSize(14);
-      doc.setTextColor(249, 115, 22);
-      doc.text('Total:', 135, finalY + 28);
-      doc.text(`KES ${parseFloat(totalAmount).toLocaleString()}`, 190, finalY + 28, { align: 'right' });
-      
-      doc.setTextColor(0, 0, 0);
-      
-      if (docType === 'Receipt') {
-          doc.setFontSize(16);
-          if (item.status === 'paid' || item.status === 'completed') {
-              doc.setTextColor(34, 197, 94); // green-500
-              doc.text('PAID IN FULL', 14, finalY + 20);
-          } else {
-              doc.setTextColor(239, 68, 68); // red-500
-              doc.text('PAYMENT PENDING', 14, finalY + 20);
-          }
-      } else if (docType === 'Invoice') {
-          doc.setFontSize(10);
-          doc.setTextColor(0,0,0);
-          doc.text('Payment Terms: Due upon receipt.', 14, finalY + 20);
+    headers = ['Description', 'Qty', 'Unit Price (KES)', 'Total (KES)'];
+    if (type === 'Order') {
+      if (item.items?.length) {
+        rows = item.items.map(i => [
+          i.name, i.quantity,
+          parseFloat(i.price).toLocaleString(),
+          (i.quantity * parseFloat(i.price)).toLocaleString()
+        ]);
+      } else {
+        rows = [[`Order #${item.id}`, 1,
+          parseFloat(item.total_amount).toLocaleString(),
+          parseFloat(item.total_amount).toLocaleString()]];
       }
-  } else {
-      // Delivery Note specific footer
-      doc.setFontSize(10);
-      doc.text('Received by (Name & Signature): _________________________', 14, finalY + 30);
-      doc.text('Date: _________________________', 14, finalY + 40);
+    } else {
+      rows = [[item.service_name || 'Service Booking', 1,
+        parseFloat(item.total_price).toLocaleString(),
+        parseFloat(item.total_price).toLocaleString()]];
+    }
   }
-  
+
+  const tableEndY = drawTable(doc, headers, rows, 78);
+
+  // ── Totals / Footer ──
+  if (docType !== 'Delivery Note') {
+    const total = type === 'Order' ? item.total_amount : item.total_price;
+
+    // Total box
+    doc.setFillColor(241, 245, 249);
+    doc.rect(120, tableEndY + 8, 76, 22, 'F');
+    doc.setDrawColor(15, 23, 42);
+    doc.rect(120, tableEndY + 8, 76, 22);
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(80, 80, 80);
+    doc.text('Subtotal:', 124, tableEndY + 16);
+    doc.text(`KES ${parseFloat(total).toLocaleString()}`, 194, tableEndY + 16, { align: 'right' });
+
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(15, 23, 42);
+    doc.text('TOTAL:', 124, tableEndY + 25);
+    doc.setTextColor(249, 115, 22);
+    doc.text(`KES ${parseFloat(total).toLocaleString()}`, 194, tableEndY + 25, { align: 'right' });
+
+    // Paid stamp (Receipt only)
+    if (docType === 'Receipt') {
+      const isPaid = item.status === 'paid' || item.status === 'completed';
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(isPaid ? 34 : 239, isPaid ? 197 : 68, isPaid ? 94 : 68);
+      doc.text(isPaid ? '✓ PAID IN FULL' : 'PAYMENT PENDING', 14, tableEndY + 22);
+    } else {
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 100, 100);
+      doc.text('Payment Terms: Due upon receipt.', 14, tableEndY + 18);
+      doc.text('Bank: Equity Bank  |  A/C: 1234567890  |  Name: Grielisha Digital Ltd', 14, tableEndY + 24);
+    }
+  } else {
+    // Delivery note sign-off
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(30, 30, 30);
+    doc.text('Received by (Print Name): _______________________________', 14, tableEndY + 18);
+    doc.text('Signature: _______________________________   Date: ___________', 14, tableEndY + 28);
+  }
+
+  // ── Page footer ──
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'italic');
   doc.setTextColor(156, 163, 175);
-  doc.setFontSize(10);
-  doc.text('Thank you for choosing Grielisha Digital!', 105, 280, { align: 'center' });
-  
-  doc.save(`${docType.replace(' ', '_')}_${type}_${item.id}.pdf`);
+  doc.text('Thank you for choosing Grielisha Digital! — grielisha.com', 105, 285, { align: 'center' });
+  doc.line(14, 282, 196, 282);
+
+  doc.save(`${docType.replace(/ /g, '_')}_${type}_${item.id}.pdf`);
 };
