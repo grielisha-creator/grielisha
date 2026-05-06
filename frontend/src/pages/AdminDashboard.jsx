@@ -118,12 +118,12 @@ const AdminDashboard = () => {
     try {
       const endpoint = selectedEntry.type === 'Booking' ? `bookings/${selectedEntry.id}/` : `orders/${selectedEntry.id}/`
       const payload = selectedEntry.type === 'Booking' 
-        ? { status: formData.status }
+        ? { status: formData.status || 'pending' }
         : {
-            delivery_status: formData.delivery_status,
-            transport_provider: formData.transport_provider,
-            tracking_number: formData.tracking_number,
-            estimated_delivery_date: formData.estimated_delivery_date
+            delivery_status: formData.delivery_status || 'pending',
+            transport_provider: formData.transport_provider || null,
+            tracking_number: formData.tracking_number || null,
+            estimated_delivery_date: formData.estimated_delivery_date || null
           }
           
       await api.patch(endpoint, payload)
@@ -131,7 +131,10 @@ const AdminDashboard = () => {
       setIsBookingModalOpen(false)
       fetchDashboardData()
     } catch (err) {
-      alert(`Failed to update ${selectedEntry?.type?.toLowerCase() || 'logistics'} status.`)
+      console.error("Update Logistics Error:", err.response?.data || err)
+      const errorData = err.response?.data
+      const errorMsg = typeof errorData === 'object' ? JSON.stringify(errorData) : 'Unknown error'
+      alert(`Failed to update ${selectedEntry?.type?.toLowerCase() || 'logistics'} status.\nServer responded with: ${errorMsg}`)
     }
   }
 
