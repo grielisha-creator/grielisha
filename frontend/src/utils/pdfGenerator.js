@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 const COMPANY_NAME = 'GRIELISHA DIGITAL';
 const COMPANY_CONTACT = 'info@grielisha.com | +254 700 000 000';
@@ -85,7 +85,7 @@ export const generateDocument = (item, type, docType) => {
      }
   }
   
-  doc.autoTable({
+  autoTable(doc, {
     startY: 80,
     head: head,
     body: body,
@@ -95,7 +95,7 @@ export const generateDocument = (item, type, docType) => {
     margin: { top: 80 }
   });
   
-  const finalY = doc.lastAutoTable.finalY || 80;
+  const finalY = doc.lastAutoTable?.finalY || 80;
   
   if (docType !== 'Delivery Note') {
       const totalAmount = type === 'Order' ? item.total_amount : item.total_price;
