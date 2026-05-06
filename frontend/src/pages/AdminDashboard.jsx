@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Users, ShoppingBag, Calendar, DollarSign, Package, TrendingUp, Eye, Edit, Trash2, Check, X, Plus, AlertCircle, Smartphone, Landmark, Banknote, CreditCard, RefreshCw, Zap } from 'lucide-react'
+import { Users, ShoppingBag, Calendar, DollarSign, Package, TrendingUp, Eye, Edit, Trash2, Check, X, Plus, AlertCircle, Smartphone, Landmark, Banknote, CreditCard, RefreshCw, Zap, Download } from 'lucide-react'
 import api from '../api/axios'
 import Modal, { ModalBody, ModalFooter } from '../components/Modal'
 import Input from '../components/Input'
+import { generateDocument } from '../utils/pdfGenerator'
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview')
@@ -878,6 +879,7 @@ const AdminDashboard = () => {
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Date</th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Amount</th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider sticky right-0 bg-[#0f172a] shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">Documents</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -898,6 +900,13 @@ const AdminDashboard = () => {
                       }`}>
                       {order.status.replace('_', ' ')}
                     </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right sticky right-0 bg-[#0f172a] shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">
+                    <div className="flex justify-end space-x-1">
+                      <button onClick={() => generateDocument(order, 'Order', 'Invoice')} className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 text-[10px]" title="Download Invoice">INV</button>
+                      <button onClick={() => generateDocument(order, 'Order', 'Receipt')} className="px-2 py-1 bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 text-[10px]" title="Download Receipt">REC</button>
+                      <button onClick={() => generateDocument(order, 'Order', 'Delivery Note')} className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded hover:bg-purple-500/30 text-[10px]" title="Download Delivery Note">DEL</button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -949,16 +958,23 @@ const AdminDashboard = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right sticky right-0 bg-[#0f172a] shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">
-                    <button
-                      onClick={() => {
-                        setSelectedEntry({ ...booking, type: 'Booking' });
-                        setFormData({ status: booking.status });
-                        setIsBookingModalOpen(true);
-                      }}
-                      className="p-1 px-3 bg-accent/20 text-accent rounded-lg hover:bg-accent/30 transition-all text-xs"
-                    >
-                      Update
-                    </button>
+                    <div className="flex flex-col space-y-2 items-end">
+                      <button
+                        onClick={() => {
+                          setSelectedEntry({ ...booking, type: 'Booking' });
+                          setFormData({ status: booking.status });
+                          setIsBookingModalOpen(true);
+                        }}
+                        className="p-1 px-3 bg-accent/20 text-accent rounded-lg hover:bg-accent/30 transition-all text-xs w-full text-center"
+                      >
+                        Update
+                      </button>
+                      <div className="flex space-x-1">
+                        <button onClick={() => generateDocument(booking, 'Booking', 'Invoice')} className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 text-[10px]" title="Invoice">INV</button>
+                        <button onClick={() => generateDocument(booking, 'Booking', 'Receipt')} className="px-2 py-1 bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 text-[10px]" title="Receipt">REC</button>
+                        <button onClick={() => generateDocument(booking, 'Booking', 'Delivery Note')} className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded hover:bg-purple-500/30 text-[10px]" title="Delivery Note">DEL</button>
+                      </div>
+                    </div>
                   </td>
                   </tr>
               ))}
@@ -1130,25 +1146,33 @@ const AdminDashboard = () => {
                       {entry.tracking_number || <span className="text-gray-600 italic">No Ref</span>}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right sticky right-0 bg-[#0f172a] shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">
-                      <button
-                        onClick={() => {
-                          setSelectedEntry(entry);
-                          if (entry.type === 'Order') {
-                            setFormData({
-                              delivery_status: entry.delivery_status,
-                              transport_provider: entry.transport_provider,
-                              tracking_number: entry.tracking_number,
-                            });
-                            setIsLogisticsModalOpen(true);
-                          } else {
-                            setFormData({ status: entry.status });
-                            setIsBookingModalOpen(true);
-                          }
-                        }}
-                        className="p-1 px-3 bg-accent/20 text-accent rounded-lg hover:bg-accent/30 transition-all text-xs"
-                      >
-                        Update
-                      </button>
+                      <div className="flex flex-col space-y-2 items-end">
+                        <button
+                          onClick={() => {
+                            setSelectedEntry(entry);
+                            if (entry.type === 'Order') {
+                              setFormData({
+                                delivery_status: entry.delivery_status,
+                                transport_provider: entry.transport_provider,
+                                tracking_number: entry.tracking_number,
+                                estimated_delivery_date: entry.estimated_delivery_date
+                              });
+                              setIsLogisticsModalOpen(true);
+                            } else {
+                              setFormData({ status: entry.status });
+                              setIsBookingModalOpen(true);
+                            }
+                          }}
+                          className="p-1 px-3 bg-accent/20 text-accent rounded-lg hover:bg-accent/30 transition-all text-xs w-full text-center"
+                        >
+                          Update
+                        </button>
+                        <div className="flex space-x-1">
+                          <button onClick={() => generateDocument(entry, entry.type, 'Invoice')} className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 text-[10px]" title="Invoice">INV</button>
+                          <button onClick={() => generateDocument(entry, entry.type, 'Receipt')} className="px-2 py-1 bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 text-[10px]" title="Receipt">REC</button>
+                          <button onClick={() => generateDocument(entry, entry.type, 'Delivery Note')} className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded hover:bg-purple-500/30 text-[10px]" title="Delivery Note">DEL</button>
+                        </div>
+                      </div>
                     </td>
                   </tr>
                 ))}
