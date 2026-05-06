@@ -924,7 +924,7 @@ const AdminDashboard = () => {
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">User</th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Price</th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider sticky right-0 bg-[#0f172a] shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -939,28 +939,27 @@ const AdminDashboard = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-accent font-semibold">
                     KES {parseFloat(booking.total_price).toLocaleString()}
                   </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
-                        booking.status === 'paid' || booking.status === 'confirmed' ? 'bg-green-500/20 text-green-400' : 
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${booking.status === 'completed' || booking.status === 'paid' ? 'bg-green-500/20 text-green-400' :
                         booking.status === 'pending' || booking.status === 'pending_payment' ? 'bg-yellow-500/20 text-yellow-400' :
-                        booking.status === 'rejected' || booking.status === 'cancelled' ? 'bg-red-500/20 text-red-400' :
-                        'bg-blue-500/20 text-blue-400'
+                          booking.status === 'rejected' || booking.status === 'cancelled' ? 'bg-red-500/20 text-red-400' :
+                            'bg-blue-500/20 text-blue-400'
                       }`}>
-                        {booking.status?.replace('_', ' ') || 'pending'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                      <button
-                        onClick={() => {
-                          setSelectedEntry({ ...booking, type: 'Booking' });
-                          setFormData({ status: booking.status });
-                          setIsBookingModalOpen(true);
-                        }}
-                        className="p-1 px-3 bg-accent/20 text-accent rounded-lg hover:bg-accent/30 transition-all text-xs"
-                      >
-                        Update
-                      </button>
-                    </td>
+                      {booking.status?.replace('_', ' ')}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right sticky right-0 bg-[#0f172a] shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">
+                    <button
+                      onClick={() => {
+                        setSelectedEntry({ ...booking, type: 'Booking' });
+                        setFormData({ status: booking.status });
+                        setIsBookingModalOpen(true);
+                      }}
+                      className="p-1 px-3 bg-accent/20 text-accent rounded-lg hover:bg-accent/30 transition-all text-xs"
+                    >
+                      Update
+                    </button>
+                  </td>
                   </tr>
               ))}
             </tbody>
@@ -1074,7 +1073,7 @@ const AdminDashboard = () => {
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Order Status</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Delivery</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Tracking</th>
-                  <th className="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider sticky right-0 bg-[#0f172a] shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -1130,7 +1129,7 @@ const AdminDashboard = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400 font-mono">
                       {entry.tracking_number || <span className="text-gray-600 italic">No Ref</span>}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                    <td className="px-6 py-4 whitespace-nowrap text-right sticky right-0 bg-[#0f172a] shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">
                       <button
                         onClick={() => {
                           setSelectedEntry(entry);
