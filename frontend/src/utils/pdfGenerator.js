@@ -1,8 +1,14 @@
 import jsPDF from 'jspdf';
 
 const COMPANY_NAME = 'GRIELISHA DIGITAL';
-const COMPANY_CONTACT = 'info@grielisha.com | +254 700 000 000';
+const COMPANY_EMAIL = 'grielishadigital@gmail.com';
+const COMPANY_PHONE = '+254 112 556 940';
 const COMPANY_ADDRESS = 'Kisumu, Kenya';
+const COMPANY_OWNER = 'Griffin Elisha Omwandasi';
+const BANK_NAME = 'I&M Bank';
+const BANK_ACCOUNT = '06005971486150';
+const BANK_ACCOUNT_NAME = 'Griffin Elisha Omwandasi';
+const MPESA_NUMBER = '0112556940';
 
 // Draw a table manually using raw jsPDF primitives
 const drawTable = (doc, headers, rows, startY) => {
@@ -66,7 +72,7 @@ export const generateDocument = (item, type, docType) => {
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(156, 163, 175);
-  doc.text(`${COMPANY_ADDRESS}  |  ${COMPANY_CONTACT}`, 14, 26);
+  doc.text(`${COMPANY_ADDRESS}  |  ${COMPANY_PHONE}  |  ${COMPANY_EMAIL}`, 14, 26);
 
   // Document type label (top right)
   doc.setTextColor(249, 115, 22);
@@ -176,8 +182,9 @@ export const generateDocument = (item, type, docType) => {
       doc.setFontSize(9);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(100, 100, 100);
-      doc.text('Payment Terms: Due upon receipt.', 14, tableEndY + 18);
-      doc.text('Bank: Equity Bank  |  A/C: 1234567890  |  Name: Grielisha Digital Ltd', 14, tableEndY + 24);
+      doc.text('Payment Terms: Due upon receipt.', 14, tableEndY + 14);
+      doc.text(`Bank: ${BANK_NAME}  |  A/C No: ${BANK_ACCOUNT}`, 14, tableEndY + 20);
+      doc.text(`A/C Name: ${BANK_ACCOUNT_NAME}  |  M-Pesa: ${MPESA_NUMBER} (${COMPANY_OWNER})`, 14, tableEndY + 26);
     }
   } else {
     // Delivery note sign-off
@@ -192,7 +199,7 @@ export const generateDocument = (item, type, docType) => {
   doc.setFontSize(8);
   doc.setFont('helvetica', 'italic');
   doc.setTextColor(156, 163, 175);
-  doc.text('Thank you for choosing Grielisha Digital! — grielisha.com', 105, 285, { align: 'center' });
+  doc.text(`Thank you for choosing Grielisha Digital! | ${COMPANY_EMAIL} | ${COMPANY_PHONE}`, 105, 285, { align: 'center' });
   doc.line(14, 282, 196, 282);
 
   doc.save(`${docType.replace(/ /g, '_')}_${type}_${item.id}.pdf`);

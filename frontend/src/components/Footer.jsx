@@ -77,7 +77,25 @@ const Footer = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <MapPin size={16} className="text-accent" />
-                <span className="text-gray-300 text-sm">Nairobi, Kenya</span>
+                <span className="text-gray-300 text-sm">Kisumu, Kenya</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Payment Info */}
+          <div>
+            <h3 className="text-white font-semibold mb-4">Payment Details</h3>
+            <div className="space-y-3 text-sm">
+              <div>
+                <p className="text-gray-400 text-xs uppercase tracking-wider mb-1">M-Pesa</p>
+                <p className="text-white font-semibold">0112 556 940</p>
+                <p className="text-gray-400 text-xs">Griffin Elisha Omwandasi</p>
+              </div>
+              <div>
+                <p className="text-gray-400 text-xs uppercase tracking-wider mb-1">Bank Transfer</p>
+                <p className="text-white font-semibold">I&amp;M Bank</p>
+                <p className="text-gray-300">A/C: 06005971486150</p>
+                <p className="text-gray-400 text-xs">Griffin Elisha Omwandasi</p>
               </div>
             </div>
           </div>

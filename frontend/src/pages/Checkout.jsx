@@ -265,10 +265,10 @@ const Checkout = () => {
                         <h3 className="font-bold uppercase tracking-wider">M-Pesa Instructions</h3>
                       </div>
                       <ol className="list-decimal list-inside text-gray-300 space-y-2 text-sm">
-                        <li>Go to M-Pesa Menu and select **Send Money**.</li>
-                        <li>Enter Phone Number: <span className="text-white font-bold">+254 112 556 940</span> (GRIELISHA).</li>
+                        <li>Go to M-Pesa Menu and select <strong>Send Money</strong>.</li>
+                        <li>Enter Phone Number: <span className="text-white font-bold">0112 556 940</span> — <span className="text-accent">Griffin Elisha Omwandasi</span>.</li>
                         <li>Enter Amount: <span className="text-white font-bold">KES {total.toLocaleString()}</span>.</li>
-                        <li>Complete transfer and enter the **Confirmation Code** below.</li>
+                        <li>Complete the transfer, then paste the <strong>Confirmation Code</strong> below.</li>
                       </ol>
                       <div className="mt-6">
                         <label className="block text-sm font-medium text-gray-400 mb-2">Transaction Code (e.g. SJK4X5Y6Z7)</label>
@@ -285,9 +285,9 @@ const Checkout = () => {
                       </div>
                       <div className="grid grid-cols-2 gap-4 text-sm bg-white/5 p-4 rounded-lg mb-4">
                         <span className="text-gray-400">Bank:</span>
-                        <span className="text-white font-semibold">I&M Bank</span>
+                        <span className="text-white font-semibold">I&amp;M Bank</span>
                         <span className="text-gray-400">Account Name:</span>
-                        <span className="text-white font-semibold">GRIELISHA</span>
+                        <span className="text-white font-semibold">Griffin Elisha Omwandasi</span>
                         <span className="text-gray-400">Account Number:</span>
                         <span className="text-white font-semibold tracking-widest text-glow">06005971486150</span>
                         <span className="text-gray-400">Amount:</span>
