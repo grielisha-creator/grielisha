@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Heart, ShoppingCart, Trash2, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import api from '../api/axios'
+import { getImageUrl } from '../utils/image'
 
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState({ products: [], services: [], product_details: [] })
@@ -88,7 +89,7 @@ const Wishlist = () => {
               >
                 <div className="relative h-48 bg-white/5 flex items-center justify-center">
                   {product.image ? (
-                    <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                    <img src={getImageUrl(product.image)} alt={product.name} className="w-full h-full object-cover" />
                   ) : (
                     <ShoppingCart className="text-white/10" size={64} />
                   )}

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ShoppingCart, Calendar, ArrowRight, Star, Shield, Zap, Globe } from 'lucide-react'
 import api from '../api/axios'
+import { getImageUrl } from '../utils/image'
 
 const Home = () => {
   const [recommendations, setRecommendations] = useState({
@@ -160,7 +161,7 @@ const Home = () => {
                   <div className="glass rounded-xl overflow-hidden hover:bg-white/10 transition-all group-hover:scale-105 transform">
                     <div className="h-48 bg-gradient-to-br from-accent/20 to-glow/20 flex items-center justify-center relative">
                       {product.image ? (
-                        <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                        <img src={getImageUrl(product.image)} alt={product.name} className="w-full h-full object-cover" />
                       ) : (
                         <Globe className="text-accent" size={48} />
                       )}
@@ -259,7 +260,7 @@ const Home = () => {
                   <div className="glass-dark rounded-xl p-4 border border-white/5 hover:border-accent/20 transition-all">
                     <div className="aspect-square bg-white/5 rounded-lg mb-4 overflow-hidden relative">
                       {product.image ? (
-                        <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                        <img src={getImageUrl(product.image)} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <ShoppingCart className="text-white/10" size={64} />

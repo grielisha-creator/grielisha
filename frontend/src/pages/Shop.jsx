@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { useDebounce } from '../hooks/useDebounce'
 import { useToast } from '../contexts/ToastContext'
 import api from '../api/axios'
+import { getImageUrl } from '../utils/image'
 import LoadingSpinner from '../components/LoadingSpinner'
 import ErrorMessage from '../components/ErrorMessage'
 
@@ -77,7 +78,7 @@ const Shop = () => {
     >
       <div className="relative h-48 bg-gradient-to-br from-accent/20 to-glow/20 flex items-center justify-center overflow-hidden">
         {product.image ? (
-          <img src={product.image} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+          <img src={getImageUrl(product.image)} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
         ) : (
           <ShoppingCart className="text-accent/50" size={48} />
         )}

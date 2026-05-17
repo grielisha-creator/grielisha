@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ShoppingCart, Star, Package, ArrowLeft, Plus, Minus, Heart } from 'lucide-react'
 import api from '../api/axios'
+import { getImageUrl } from '../utils/image'
 
 const ProductDetails = () => {
   const { id } = useParams()
@@ -117,7 +118,7 @@ const ProductDetails = () => {
             <div className="glass rounded-xl overflow-hidden neon-glow">
               <div className="h-96 bg-gradient-to-br from-accent/20 to-glow/20 flex items-center justify-center relative overflow-hidden">
                 {product.image ? (
-                  <img src={product.image} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+                  <img src={getImageUrl(product.image)} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
                 ) : (
                   <Package className="text-accent/50" size={96} />
                 )}
@@ -279,7 +280,7 @@ const ProductDetails = () => {
                 >
                   <div className="h-32 bg-gradient-to-br from-accent/20 to-glow/20 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
                     {item.image ? (
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                      <img src={getImageUrl(item.image)} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
                     ) : (
                       <Package className="text-accent/50" size={48} />
                     )}

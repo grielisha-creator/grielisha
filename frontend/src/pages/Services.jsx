@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Search, Filter, Calendar, Clock, DollarSign, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import api from '../api/axios'
+import { getImageUrl } from '../utils/image'
 
 const Services = () => {
   const [services, setServices] = useState([])
@@ -61,7 +62,7 @@ const Services = () => {
     >
       <div className="relative h-48 bg-gradient-to-br from-accent/20 to-glow/20 flex items-center justify-center overflow-hidden">
         {service.image ? (
-          <img src={service.image} alt={service.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+          <img src={getImageUrl(service.image)} alt={service.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
         ) : (
           <Calendar className="text-accent/50" size={48} />
         )}
