@@ -114,7 +114,7 @@ CLOUDINARY_STORAGE = {
 }
 
 # Use Cloudinary for all media files if credentials are configured
-if config('CLOUDINARY_CLOUD_NAME', default=''):
+if config('CLOUDINARY_CLOUD_NAME', default='') and config('CLOUDINARY_API_KEY', default='') and config('CLOUDINARY_API_SECRET', default=''):
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
     MEDIA_URL = f"https://res.cloudinary.com/{config('CLOUDINARY_CLOUD_NAME', default='')}/"
 else:
