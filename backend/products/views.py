@@ -150,10 +150,10 @@ class RecommendationView(APIView):
                 )[:2]
 
         return Response({
-            'popular_products': ProductListSerializer(popular_products, many=True).data,
-            'featured_products': ProductListSerializer(featured_products, many=True).data,
-            'featured_services': ServiceListSerializer(featured_services, many=True).data,
-            'cross_sell_services': ServiceListSerializer(cross_sell_services, many=True).data if cross_sell_services else []
+            'popular_products': ProductListSerializer(popular_products, many=True, context={'request': request}).data,
+            'featured_products': ProductListSerializer(featured_products, many=True, context={'request': request}).data,
+            'featured_services': ServiceListSerializer(featured_services, many=True, context={'request': request}).data,
+            'cross_sell_services': ServiceListSerializer(cross_sell_services, many=True, context={'request': request}).data if cross_sell_services else []
         })
 
 class StatsSummaryView(APIView):

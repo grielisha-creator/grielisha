@@ -20,7 +20,18 @@ const ProductDetails = () => {
           api.get(`products/${id}/`),
           api.get('products/wishlist/').catch(() => ({ data: { products: [] } }))
         ])
-        setProduct(prodRes.data)
+        const prodData = prodRes.data
+        if (typeof prodData.features === 'string') {
+          try { prodData.features = JSON.parse(prodData.features) } catch(e) { prodData.features = [] }
+        }
+        if (!Array.isArray(prodData.features)) prodData.features = []
+        
+        if (typeof prodData.specifications === 'string') {
+          try { prodData.specifications = JSON.parse(prodData.specifications) } catch(e) { prodData.specifications = {} }
+        }
+        if (!prodData.specifications || typeof prodData.specifications !== 'object') prodData.specifications = {}
+        
+        setProduct(prodData)
         setIsWishlisted(wishRes.data.products.includes(parseInt(id)))
       } catch (err) {
         console.error("Failed to fetch product data", err)

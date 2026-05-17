@@ -27,7 +27,13 @@ const Booking = () => {
     try {
       setLoading(true)
       const response = await api.get(`services/${serviceId}/`)
-      setService(response.data)
+      const serviceData = response.data
+      if (typeof serviceData.features === 'string') {
+        try { serviceData.features = JSON.parse(serviceData.features) } catch(e) { serviceData.features = [] }
+      }
+      if (!Array.isArray(serviceData.features)) serviceData.features = []
+      
+      setService(serviceData)
     } catch (err) {
       console.error("Failed to load service", err)
     } finally {
