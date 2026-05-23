@@ -9,7 +9,7 @@
   
   body {
     @apply bg-primary text-white font-sans selection:bg-accent/30;
-    background: radial-gradient(circle at top left, #0a0a0f 0%, #1a1b25 100%);
+    background: radial-gradient(circle at top left, #090d1a 0%, #05070d 100%);
     min-height: 100vh;
   }
 }
@@ -21,85 +21,51 @@
     overflow: hidden;
   }
   
-  .glass::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      120deg,
-      transparent,
-      rgba(255, 255, 255, 0.05),
-      transparent
-    );
-    transition: 0.5s;
-  }
-  
-  .glass:hover::before {
-    left: 100%;
-  }
+  .glass::before { display:none; }
   
   .glass-dark {
     @apply bg-black/40 backdrop-blur-2xl border border-white/5 shadow-2xl;
   }
   
   .neon-glow {
-    @apply shadow-[0_0_30px_rgba(0,194,255,0.3)];
-    animation: glow-pulse 3s infinite alternate;
+    @apply shadow-[0_0_30px_rgba(0,229,255,0.3)];
+    /* animation disabled */
   }
   
   .neon-glow-accent {
-    @apply shadow-[0_0_30px_rgba(255,106,0,0.3)];
-    animation: accent-pulse 4s infinite alternate;
+    @apply shadow-[0_0_30px_rgba(255,107,0,0.3)];
+    /* animation disabled */
   }
   
   .text-glow {
-    @apply text-cyan-400;
-    text-shadow: 0 0 10px rgba(0, 194, 255, 0.5), 0 0 20px rgba(0, 194, 255, 0.2);
+    @apply text-[#00E5FF];
+    text-shadow: 0 0 10px rgba(0, 229, 255, 0.5), 0 0 20px rgba(0, 229, 255, 0.2);
   }
   
   .text-glow-accent {
     @apply text-accent;
-    text-shadow: 0 0 10px rgba(255, 106, 0, 0.5), 0 0 20px rgba(255, 106, 0, 0.2);
+    text-shadow: 0 0 10px rgba(255, 107, 0, 0.5), 0 0 20px rgba(255, 107, 0, 0.2);
   }
 
   .btn-premium {
-    @apply px-6 py-2 rounded-full font-semibold transition-all duration-300 active:scale-95;
-    background: linear-gradient(45deg, #ff6a00, #ee0979);
-    box-shadow: 0 4px 15px rgba(238, 9, 121, 0.3);
+    @apply px-6 py-2 rounded-full font-semibold transition-all duration-300 active:scale-95 text-white;
+    background: linear-gradient(45deg, #FF6B00, #00E5FF);
+    box-shadow: 0 4px 15px rgba(0, 229, 255, 0.3);
   }
 
   .btn-premium:hover {
-    @apply shadow-[0_0_20px_rgba(238,9,121,0.5)];
+    @apply shadow-[0_0_20px_rgba(0,229,255,0.5)];
     transform: translateY(-2px);
   }
 
   .card-pulse:hover {
-    animation: heart-pulse 2s infinite ease-in-out;
+    /* animation disabled */
+  }
+
+  .bg-mesh {
+    background-color: #090d1a;
   }
 }
 
-@keyframes glow-pulse {
-  from { box-shadow: 0 0 20px rgba(0, 194, 255, 0.2); }
-  to { box-shadow: 0 0 40px rgba(0, 194, 255, 0.5); }
-}
+/* keyframe animations removed */
 
-@keyframes accent-pulse {
-  from { box-shadow: 0 0 20px rgba(255, 106, 0, 0.2); }
-  to { box-shadow: 0 0 40px rgba(255, 106, 0, 0.5); }
-}
-
-@keyframes heart-pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-  100% { transform: scale(1); }
-}
-
-.bg-mesh {
-  background-image: 
-    radial-gradient(at 0% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
-    radial-gradient(at 50% 0%, hsla(225,39%,23%,1) 0, transparent 50%), 
-    radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
-}

@@ -7,9 +7,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#0A0F1C',
-        accent: '#FF6A00',
-        glow: '#00C2FF',
+        primary: '#090D1A',
+        accent: '#FF6B00',
+        glow: '#00E5FF',
       },
       animation: {
         'glow': 'glow 2s ease-in-out infinite alternate',

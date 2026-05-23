@@ -1,15 +1,8 @@
 import axios from 'axios'
 
-const rawUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
-// Normalize URL: Remove any trailing slashes then add exactly one
-let normalized = rawUrl.replace(/\/+$/, '') + '/'
-
-// Force /api/ if missing
-if (!normalized.endsWith('/api/')) {
-    normalized = normalized + 'api/'
-}
-
-const API_BASE_URL = normalized
+const rawUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/'
+// Ensure exactly one trailing slash
+const API_BASE_URL = rawUrl.replace(/\/+$/,'') + '/'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -63,7 +56,12 @@ api.interceptors.response.use(
       } catch (refreshError) {
         localStorage.removeItem('access_token')
         localStorage.removeItem('refresh_token')
-        window.location.href = '/login'
+        
+        const currentPath = window.location.pathname
+        if (currentPath !== '/login' && currentPath !== '/register' && currentPath !== '/') {
+          window.location.href = '/login'
+        }
+        
         return Promise.reject(refreshError)
       }
     }

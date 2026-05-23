@@ -1,14 +1,14 @@
 import jsPDF from 'jspdf';
 
-const COMPANY_NAME = 'GRIELISHA DIGITAL';
-const COMPANY_EMAIL = 'grielishadigital@gmail.com';
-const COMPANY_PHONE = '+254 112 556 940';
-const COMPANY_ADDRESS = 'Kisumu, Kenya';
-const COMPANY_OWNER = 'Griffin Elisha Omwandasi';
-const BANK_NAME = 'I&M Bank';
-const BANK_ACCOUNT = '06005971486150';
-const BANK_ACCOUNT_NAME = 'Griffin Elisha Omwandasi';
-const MPESA_NUMBER = '0112556940';
+const COMPANY_NAME = 'GELWO TECHNOLOGIES';
+const COMPANY_EMAIL = 'gelwotech@gmail.com';
+const COMPANY_PHONE = '079-782-9911 / 0112556940';
+const COMPANY_ADDRESS = 'Lwande Apartment Door 52, Kakamega, Kenya';
+const COMPANY_OWNER = 'Gelwo Technologies';
+const BANK_NAME = 'Kenya Commercial Bank (KCB)';
+const BANK_ACCOUNT = '1335480404';
+const BANK_ACCOUNT_NAME = 'Gelwo Technologies';
+const MPESA_NUMBER = '0797829911';
 
 // Draw a table manually using raw jsPDF primitives
 const drawTable = (doc, headers, rows, startY) => {
@@ -17,7 +17,7 @@ const drawTable = (doc, headers, rows, startY) => {
   const startX = 14;
 
   // Header row background
-  doc.setFillColor(15, 23, 42);
+  doc.setFillColor(126, 56, 158);
   doc.rect(startX, startY, 182, rowHeight, 'F');
 
   // Header text
@@ -50,32 +50,49 @@ const drawTable = (doc, headers, rows, startY) => {
   });
 
   // Outer border
-  doc.setDrawColor(15, 23, 42);
+  doc.setDrawColor(126, 56, 158);
   doc.rect(startX, startY, 182, rowHeight * (rows.length + 1));
 
   return startY + rowHeight * (rows.length + 1);
 };
 
-export const generateDocument = (item, type, docType) => {
+export const generateDocument = async (item, type, docType) => {
   const doc = new jsPDF();
   const dateStr = new Date().toLocaleDateString();
 
+  // Load the logo image asynchronously
+  const img = new Image();
+  img.src = '/logo.png';
+  await new Promise((resolve) => {
+    img.onload = resolve;
+    img.onerror = resolve; // Continue even if logo fails to load
+  });
+
   // ── Header band ──
-  doc.setFillColor(15, 23, 42);
+  doc.setFillColor(126, 56, 158);
   doc.rect(0, 0, 210, 42, 'F');
+
+  // Add Logo to PDF if loaded successfully
+  let textX = 14;
+  if (img.complete && img.naturalWidth > 0) {
+    const imgHeight = 24;
+    const imgWidth = imgHeight * (img.naturalWidth / img.naturalHeight);
+    doc.addImage(img, 'PNG', 14, 9, imgWidth, imgHeight);
+    textX = 14 + imgWidth + 6; // Shift text to the right
+  }
 
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(22);
   doc.setFont('helvetica', 'bold');
-  doc.text(COMPANY_NAME, 14, 18);
+  doc.text(COMPANY_NAME, textX, 18);
 
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(156, 163, 175);
-  doc.text(`${COMPANY_ADDRESS}  |  ${COMPANY_PHONE}  |  ${COMPANY_EMAIL}`, 14, 26);
+  doc.text(`${COMPANY_ADDRESS}  |  ${COMPANY_PHONE}  |  ${COMPANY_EMAIL}`, textX, 26);
 
   // Document type label (top right)
-  doc.setTextColor(249, 115, 22);
+  doc.setTextColor(91, 138, 62);
   doc.setFontSize(24);
   doc.setFont('helvetica', 'bold');
   doc.text(docType.toUpperCase(), 196, 22, { align: 'right' });
@@ -166,9 +183,9 @@ export const generateDocument = (item, type, docType) => {
 
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(15, 23, 42);
+    doc.setTextColor(126, 56, 158);
     doc.text('TOTAL:', 124, tableEndY + 25);
-    doc.setTextColor(249, 115, 22);
+    doc.setTextColor(91, 138, 62);
     doc.text(`KES ${parseFloat(total).toLocaleString()}`, 194, tableEndY + 25, { align: 'right' });
 
     // Paid stamp (Receipt only)
@@ -176,7 +193,7 @@ export const generateDocument = (item, type, docType) => {
       const isPaid = item.status === 'paid' || item.status === 'completed';
       doc.setFontSize(18);
       doc.setFont('helvetica', 'bold');
-      doc.setTextColor(isPaid ? 34 : 239, isPaid ? 197 : 68, isPaid ? 94 : 68);
+      doc.setTextColor(isPaid ? 91 : 239, isPaid ? 138 : 68, isPaid ? 62 : 68);
       doc.text(isPaid ? '✓ PAID IN FULL' : 'PAYMENT PENDING', 14, tableEndY + 22);
     } else {
       doc.setFontSize(9);
@@ -199,7 +216,7 @@ export const generateDocument = (item, type, docType) => {
   doc.setFontSize(8);
   doc.setFont('helvetica', 'italic');
   doc.setTextColor(156, 163, 175);
-  doc.text(`Thank you for choosing Grielisha Digital! | ${COMPANY_EMAIL} | ${COMPANY_PHONE}`, 105, 285, { align: 'center' });
+  doc.text(`Thank you for choosing GELWO TECHNOLOGIES! | ${COMPANY_EMAIL} | ${COMPANY_PHONE}`, 105, 285, { align: 'center' });
   doc.line(14, 282, 196, 282);
 
   doc.save(`${docType.replace(/ /g, '_')}_${type}_${item.id}.pdf`);

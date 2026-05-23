@@ -26,7 +26,13 @@ def login_view(request):
     import traceback
     import os
     try:
-        serializer = UserLoginSerializer(data=request.data)
+        # Attempt to parse JSON body
+        try:
+            data = request.data
+        except Exception:
+            # Fallback to form data (e.g., when Content-Type is mis‑specified)
+            data = request.POST
+        serializer = UserLoginSerializer(data=data)
         if serializer.is_valid():
             user = serializer.validated_data['user']
             refresh = RefreshToken.for_user(user)

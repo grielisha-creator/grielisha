@@ -1,14 +1,7 @@
 @echo off
 echo 🚀 Starting GRIELISHA Development Servers...
 
-REM Check if PostgreSQL is running (Windows check)
-sc query postgresql-x64-16 >nul 2>&1
-if %errorlevel% neq 0 (
-    echo ⚠️  PostgreSQL is not running. Please start PostgreSQL service first.
-    echo    Open Services and start PostgreSQL
-    pause
-    exit /b 1
-)
+REM Skipping PostgreSQL check - using SQLite backend
 
 REM Start Backend Server
 echo 🔧 Starting Django Backend Server...
@@ -61,7 +54,7 @@ if not exist ".env" (
 
 REM Start React development server
 echo 🎨 Starting React server on http://localhost:3000...
-start "React Server" cmd /k "npm run dev"
+start "" cmd /k "npm run dev"
 
 REM Wait for servers to start
 timeout /t 5 >nul
@@ -75,4 +68,4 @@ echo 📚 API Documentation: http://localhost:8000/api/docs/
 echo 🔐 Admin Panel: http://localhost:8000/admin/
 echo.
 echo 🛑 Close this window to stop servers
-pause
+rem pause

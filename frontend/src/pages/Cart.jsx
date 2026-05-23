@@ -13,6 +13,12 @@ const Cart = () => {
   }, [])
 
   const fetchCartItems = async () => {
+    const token = localStorage.getItem('access_token')
+    if (!token) {
+      setCartItems([])
+      setLoading(false)
+      return
+    }
     try {
       setLoading(true)
       const response = await api.get('orders/cart/')

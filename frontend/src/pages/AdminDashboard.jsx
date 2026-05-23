@@ -1211,7 +1211,7 @@ const AdminDashboard = () => {
             Ecosystem <span className="text-accent">Admin</span>
           </h1>
           <p className="text-gray-400 text-lg">
-            GRIELISHA Central Control Unit
+            GELWO TECHNOLOGIES Operations Hub
           </p>
         </motion.div>
 
